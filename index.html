@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Easyshot - Video Editor Mini App</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body {
+            background-color: #0f1015;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 10px;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            background: #181920;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #2a2b36;
+        }
+        .app-header {
+            background: #20212c;
+            padding: 15px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff3b5c;
+            border-bottom: 1px solid #2a2b36;
+        }
+        .workspace {
+            padding: 15px;
+        }
+        .upload-box {
+            border: 2px dashed #3f4156;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            background: #20212c;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+        .upload-box:hover {
+            border-color: #ff3b5c;
+        }
+        .upload-box input { display: none; }
+        .upload-text { font-size: 14px; color: #a2a3b1; }
+        
+        .video-container {
+            position: relative;
+            width: 100%;
+            background: #000;
+            border-radius: 10px;
+            overflow: hidden;
+            display: none;
+            margin-bottom: 15px;
+        }
+        video {
+            width: 100%;
+            display: block;
+            max-height: 250px;
+        }
+        #textOverlay {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            pointer-events: none;
+            text-align: center;
+        }
+        .tools-section {
+            display: none;
+        }
+        .tool-title {
+            font-size: 13px;
+            color: #a2a3b1;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .filter-buttons, .action-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .btn {
+            background: #2a2b36;
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: 0.2s;
+        }
+        .btn:hover { background: #3f4156; }
+        .btn-primary {
+            background: #ff3b5c;
+            width: 100%;
+            padding: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .btn-primary:hover { background: #e0314f; }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            background: #20212c;
+            border: 1px solid #3f4156;
+            color: #fff;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="app-header">Easyshot Video Editor</div>
+        
+        <div class="workspace">
+            <!-- அப்லோட் பாக்ஸ் -->
+            <label class="upload-box" id="uploadLabel">
+                <div class="upload-text">📁 வீடியோவை இங்கே தேர்ந்தெடுக்கவும்</div>
+                <input type="file" id="uploadVideo" accept="video/*">
+            </label>
+            
+            <!-- வீடியோ ப்ளேயர் & டெக்ஸ்ட் லேயர் -->
+            <div class="video-container" id="videoContainer">
+                <video id="videoPlayer" controls></video>
+                <div id="textOverlay"></div>
+            </div>
+            
+            <!-- எடிட்டிங் டூல்ஸ் -->
+            <div class="tools-section" id="toolsSection">
+                <div class="tool-title">COLOR FILTERS</div>
+                <div class="filter-buttons">
+                    <button class="btn" onclick="setFilter('none')">Normal</button>
+                    <button class="btn" onclick="setFilter('grayscale(100%)')">B&W</button>
+                    <button class="btn" onclick="setFilter('sepia(100%)')">Sepia</button>
+                    <button class="btn" onclick="setFilter('contrast(150%)')">High Contrast</button>
+                </div>
+                
+                <div class="tool-title">ADD TEXT OVERLAY</div>
+                <input type="text" id="customText" placeholder="உங்கள் வாசகத்தை டைப் செய்யவும்..." oninput="updateText(this.value)">
+                
+                <button class="btn btn-primary" onclick="downloadNotice()">சேமி / Download</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const uploadVideo = document.getElementById('uploadVideo');
+        const videoPlayer = document.getElementById('videoPlayer');
+        const videoContainer = document.getElementById('videoContainer');
+        const toolsSection = document.getElementById('toolsSection');
+        const uploadLabel = document.getElementById('uploadLabel');
+        const textOverlay = document.getElementById('textOverlay');
+
+        uploadVideo.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const videoURL = URL.createObjectURL(file);
+                videoPlayer.src = videoURL;
+                uploadLabel.style.display = 'none';
+                videoContainer.style.display = 'block';
+                toolsSection.style.display = 'block';
+            }
+        });
+
+        function setFilter(filterStyle) {
+            videoPlayer.style.filter = filterStyle;
+        }
+
+        function updateText(val) {
+            textOverlay.innerText = val;
+        }
+
+        function downloadNotice() {
+            alert("Easyshot: உங்களது எடிட்டட் வீடியோ வெற்றிகரமாக தயார்!");
+        }
+    </script>
+
+</body>
+</html>

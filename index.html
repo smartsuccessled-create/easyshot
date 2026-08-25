@@ -1,9 +1,9 @@
-         <!DOCTYPE html>
+    <!DOCTYPE html>
 <html lang="ta">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easyshot Filmora Edition</title>
+    <title>Easyshot WhatsApp Status Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -37,19 +37,49 @@
             margin-bottom: 12px;
         }
         h1 {
-            color: #ff4757;
+            color: #25d366;
             font-size: 18px;
             font-weight: bold;
         }
         .pro-badge {
-            background: linear-gradient(45deg, #ff4757, #ffa502);
+            background: linear-gradient(45deg, #25d366, #128c7e);
             color: white;
             font-size: 10px;
             padding: 3px 8px;
             border-radius: 20px;
             font-weight: bold;
         }
-        .video-container {
+        /* Mode Switch Tabs */
+        .tabs-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .tab-btn {
+            background: #252a34;
+            color: #a4b0be;
+            border: 1px solid #2f3542;
+            padding: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .tab-btn.active {
+            background: #25d366;
+            color: #fff;
+            border-color: #25d366;
+        }
+        .section-box {
+            display: none;
+        }
+        .section-box.active {
+            display: block;
+        }
+        /* Video/Photo Canvas Preview */
+        .preview-container {
             position: relative;
             width: 100%;
             background: #000;
@@ -60,20 +90,22 @@
             align-items: center;
             justify-content: center;
         }
-        video {
+        video, img {
             width: 100%;
             height: 100%;
-            object-fit: contain;
+            object-fit: cover;
         }
         .overlay-text {
             position: absolute;
-            bottom: 25px;
+            bottom: 35px;
             left: 50%;
             transform: translateX(-50%);
             color: #fff;
-            font-size: 18px;
+            font-size: 20px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
+            text-shadow: 2px 2px 6px rgba(0,0,0,0.9);
+            text-align: center;
+            width: 90%;
             pointer-events: none;
         }
         .watermark {
@@ -109,7 +141,7 @@
             left: 0;
             top: 0;
             height: 100%;
-            background: rgba(255, 71, 87, 0.4);
+            background: rgba(37, 211, 102, 0.4);
             width: 0%;
             pointer-events: none;
         }
@@ -143,8 +175,8 @@
             transition: 0.2s;
         }
         .tool-btn:hover, .tool-btn.active {
-            background: #ff4757;
-            border-color: #ff4757;
+            background: #25d366;
+            border-color: #25d366;
             color: #fff;
         }
         input[type="text"] {
@@ -165,13 +197,13 @@
         }
         .upload-btn {
             background: #252a34;
-            border: 1px dashed #ff4757;
+            border: 1px dashed #25d366;
             padding: 8px;
             text-align: center;
             border-radius: 6px;
             cursor: pointer;
             font-size: 11px;
-            color: #ff4757;
+            color: #25d366;
         }
         .action-btn-row {
             display: grid;
@@ -186,20 +218,31 @@
             padding: 12px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             text-align: center;
         }
         .export-action-btn {
-            background: #ff4757;
+            background: #25d366;
             color: #fff;
             border: none;
             padding: 12px;
             border-radius: 8px;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             text-align: center;
+        }
+        /* Status Downloader specific */
+        .status-input {
+            width: 100%;
+            padding: 10px;
+            background: #252a34;
+            border: 1px solid #2f3542;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 13px;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -207,75 +250,78 @@
 
 <div class="container">
     <div class="app-header">
-        <h1>Easyshot Filmora</h1>
-        <span class="pro-badge">PRO EDITOR</span>
+        <h1>WhatsApp Status Hub</h1>
+        <span class="pro-badge">WA TOOLS</span>
     </div>
 
-    <!-- Video Canvas -->
-    <div class="video-container" id="videoContainerBox">
-        <video id="mainVideo" src="https://www.w3schools.com/html/mov_bbb.mp4" playsinline></video>
-        <div class="overlay-text" id="previewText">Easyshot</div>
-        <div class="watermark" id="watermarkDisplay">Filmora Pro</div>
+    <!-- Mode Toggle Tabs -->
+    <div class="tabs-row">
+        <button class="tab-btn active" onclick="switchTab('edit', this)">✨ Status Editor</button>
+        <button class="tab-btn" onclick="switchTab('download', this)">📥 Status Downloader</button>
     </div>
 
-    <!-- Filmora Style Timeline -->
-    <div class="timeline-box">
-        <div class="timeline-label">
-            <span id="currentTimeDisplay">0:00</span>
-            <span>TIMELINE TRACK</span>
-            <span id="durationDisplay">0:10</span>
+    <!-- TAB 1: STATUS EDITOR -->
+    <div id="editSection" class="section-box active">
+        <!-- Canvas Preview (Photo or Video) -->
+        <div class="preview-container" id="previewContainerBox">
+            <video id="mainVideo" src="https://www.w3schools.com/html/mov_bbb.mp4" playsinline></video>
+            <img id="mainImage" src="" style="display: none;" alt="Status Photo">
+            <div class="overlay-text" id="previewText">My WhatsApp Status</div>
+            <div class="watermark" id="watermarkDisplay">Status Pro</div>
         </div>
-        <div class="timeline-track" id="timelineTrack">
-            <div class="timeline-progress" id="timelineProgress"></div>
-            <span style="font-size: 11px; z-index: 2; margin: auto; color: #dfe4ea;" id="playStatusText">▶ Tap to Play / Pause</span>
+
+        <!-- Timeline (For Video) -->
+        <div class="timeline-box" id="timelineBoxContainer">
+            <div class="timeline-label">
+                <span id="currentTimeDisplay">0:00</span>
+                <span>STATUS TIMELINE</span>
+                <span id="durationDisplay">0:10</span>
+            </div>
+            <div class="timeline-track" id="timelineTrack">
+                <div class="timeline-progress" id="timelineProgress"></div>
+                <span style="font-size: 11px; z-index: 2; margin: auto; color: #dfe4ea;" id="playStatusText">▶ Play / Pause</span>
+            </div>
+        </div>
+
+        <!-- Media Uploads -->
+        <div class="file-upload-row">
+            <label class="upload-btn">
+                🖼️ போட்டோ வை (Photo)
+                <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+            </label>
+            <label class="upload-btn">
+                📁 வீடியோ வை (Video)
+                <input type="file" id="videoUpload" accept="video/*" style="display: none;">
+            </label>
+        </div>
+        <audio id="bgMusic" loop></audio>
+
+        <div class="section-title">STATUS FILTERS</div>
+        <div class="tools-grid">
+            <button class="tool-btn active" onclick="applyFilter('none', this)">Normal</button>
+            <button class="tool-btn" onclick="applyFilter('grayscale(100%)', this)">B&W</button>
+            <button class="tool-btn" onclick="applyFilter('sepia(100%)', this)">Sepia</button>
+            <button class="tool-btn" onclick="applyFilter('contrast(150%)', this)">Pop</button>
+        </div>
+
+        <div class="section-title">ADD STATUS TEXT</div>
+        <input type="text" id="textInput" placeholder="ஸ்டேட்டஸ் வாசகம்..." value="My WhatsApp Status">
+
+        <!-- Action Buttons -->
+        <div class="action-btn-row">
+            <button class="download-action-btn" onclick="sendToBot('download')">📥 Send File</button>
+            <button class="export-action-btn" onclick="sendToBot('export')">📤 Share Status</button>
         </div>
     </div>
 
-    <!-- Uploads -->
-    <div class="file-upload-row">
-        <label class="upload-btn">
-            📁 Video மாற்று
-            <input type="file" id="videoUpload" accept="video/*" style="display: none;">
-        </label>
-        <label class="upload-btn">
-            🎵 BGM சேர்
-            <input type="file" id="audioUpload" accept="audio/*" style="display: none;">
-        </label>
-    </div>
-    <audio id="bgMusic" loop></audio>
-
-    <!-- Filmora Tools Panel -->
-    <div class="section-title">ASPECT RATIO (FRAME)</div>
-    <div class="tools-grid">
-        <button class="tool-btn active" onclick="changeAspectRatio('9/16', this)">Shorts 9:16</button>
-        <button class="tool-btn" onclick="changeAspectRatio('1/1', this)">Square 1:1</button>
-        <button class="tool-btn" onclick="changeAspectRatio('16/9', this)">YouTube 16:9</button>
-        <button class="tool-btn" onclick="changeAspectRatio('4/5', this)">Insta 4:5</button>
-    </div>
-
-    <div class="section-title">VIDEO SPEED</div>
-    <div class="tools-grid">
-        <button class="tool-btn" onclick="changeSpeed(0.5, this)">0.5x</button>
-        <button class="tool-btn active" onclick="changeSpeed(1.0, this)">1.0x</button>
-        <button class="tool-btn" onclick="changeSpeed(1.5, this)">1.5x</button>
-        <button class="tool-btn" onclick="changeSpeed(2.0, this)">2.0x</button>
-    </div>
-
-    <div class="section-title">FILTERS & EFFECTS</div>
-    <div class="tools-grid">
-        <button class="tool-btn active" onclick="applyFilter('none', this)">Normal</button>
-        <button class="tool-btn" onclick="applyFilter('grayscale(100%)', this)">B&W</button>
-        <button class="tool-btn" onclick="applyFilter('sepia(100%)', this)">Sepia</button>
-        <button class="tool-btn" onclick="applyFilter('contrast(160%)', this)">Contrast</button>
-    </div>
-
-    <div class="section-title">TEXT OVERLAY</div>
-    <input type="text" id="textInput" placeholder="வீடியோ டெக்ஸ்ட்..." value="Easyshot">
-
-    <!-- Direct Download & Export Buttons -->
-    <div class="action-btn-row">
-        <button class="download-action-btn" onclick="downloadVideo()">📥 Download Video</button>
-        <button class="export-action-btn" onclick="exportProject()">📤 Export Project</button>
+    <!-- TAB 2: STATUS DOWNLOADER -->
+    <div id="downloadSection" class="section-box">
+        <div class="section-title">WHATSAPP STATUS DOWNLOADER</div>
+        <p style="font-size: 12px; color: #a4b0be; margin-bottom: 10px;">
+            நண்பர்களின் வாட்ஸ்அப் ஸ்டேட்டஸ் மீடியா லிங்க் அல்லது ஸ்டேட்டஸ் கோப்பினை கீழே உள்ளே பதிவிட்டு டவுன்லோட் செய்யுங்கள்:
+        </p>
+        <input type="text" class="status-input" placeholder="Paste Status Link / Text here...">
+        <button class="export-action-btn" style="width: 100%; margin-top: 5px;" onclick="downloadStatusAction()">📥 Fetch & Download Status</button>
     </div>
 </div>
 
@@ -284,47 +330,65 @@
     tg.expand();
 
     const video = document.getElementById('mainVideo');
-    const videoContainerBox = document.getElementById('videoContainerBox');
+    const image = document.getElementById('mainImage');
+    const timelineBoxContainer = document.getElementById('timelineBoxContainer');
     const bgMusic = document.getElementById('bgMusic');
     const textInput = document.getElementById('textInput');
     const previewText = document.getElementById('previewText');
     const videoUpload = document.getElementById('videoUpload');
-    const audioUpload = document.getElementById('audioUpload');
+    const imageUpload = document.getElementById('imageUpload');
     const timelineTrack = document.getElementById('timelineTrack');
     const timelineProgress = document.getElementById('timelineProgress');
     const currentTimeDisplay = document.getElementById('currentTimeDisplay');
     const durationDisplay = document.getElementById('durationDisplay');
     const playStatusText = document.getElementById('playStatusText');
 
+    function switchTab(tabName, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.section-box').forEach(s => s.classList.remove('active'));
+        btn.classList.add('active');
+        if(tabName === 'edit') {
+            document.getElementById('editSection').classList.add('active');
+        } else {
+            document.getElementById('downloadSection').classList.add('active');
+        }
+    }
+
     textInput.addEventListener('input', () => {
         previewText.textContent = textInput.value;
     });
 
+    // Upload Video
     videoUpload.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
+            image.style.display = 'none';
+            video.style.display = 'block';
+            timelineBoxContainer.style.display = 'block';
             video.src = URL.createObjectURL(file);
             video.load();
         }
     });
 
-    audioUpload.addEventListener('change', (event) => {
+    // Upload Photo for Status
+    imageUpload.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
-            bgMusic.src = URL.createObjectURL(file);
-            bgMusic.load();
+            video.style.display = 'none';
+            timelineBoxContainer.style.display = 'none';
+            video.pause();
+            image.style.display = 'block';
+            image.src = URL.createObjectURL(file);
         }
     });
 
     timelineTrack.addEventListener('click', () => {
         if (video.paused) {
             video.play();
-            if(bgMusic.src) bgMusic.play();
             playStatusText.textContent = "⏸ Playing...";
         } else {
             video.pause();
-            if(bgMusic.src) bgMusic.pause();
-            playStatusText.textContent = "▶ Tap to Play / Pause";
+            playStatusText.textContent = "▶ Play / Pause";
         }
     });
 
@@ -345,56 +409,34 @@
         durationDisplay.textContent = m + ':' + (s < 10 ? '0' : '') + s;
     });
 
-    function changeAspectRatio(ratio, btn) {
-        videoContainerBox.style.aspectRatio = ratio;
-        let parent = btn.parentElement;
-        parent.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
-    function changeSpeed(rate, btn) {
-        video.playbackRate = rate;
-        let parent = btn.parentElement;
-        parent.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-    }
-
     function applyFilter(filterStyle, btn) {
         video.style.filter = filterStyle;
+        image.style.filter = filterStyle;
         let parent = btn.parentElement;
         parent.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // Direct Download Handler
-    function downloadVideo() {
-        const a = document.createElement('a');
-        a.href = video.src;
-        a.download = 'easyshot_edited_video.mp4';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        tg.showAlert("வீடியோ டவுன்லோட் தொடங்குகிறது!");
-    }
-
-    // Export Handler
-    function exportProject() {
+    function sendToBot(actionType) {
         tg.sendData(JSON.stringify({
-            action: "filmora_export",
+            action: actionType,
             text: textInput.value
         }));
-        tg.showAlert("உங்களது ஃபில்மோரா ப்ராஜெக்ட் வெற்றிகரமாக எக்ஸ்போர்ட் செய்யப்பட்டது!");
+        tg.showAlert("உங்களது வாட்ஸ்அப் ஸ்டேட்டஸ் கோப்பு டெலிகிராம் பாட்டிற்கு அனுப்பப்படுகிறது!");
         tg.close();
     }
 
-    // Telegram Main Button Integration
-    tg.MainButton.text = "EXPORT FILMORA PROJECT";
-    tg.MainButton.color = tg.themeParams.button_color || "#ff4757";
-    tg.MainButton.textColor = tg.themeParams.button_text_color || "#ffffff";
+    function downloadStatusAction() {
+        tg.showAlert("ஸ்டேட்டஸ் டவுன்லோட் கோரிக்கையானது பெறப்பட்டது!");
+    }
+
+    tg.MainButton.text = "SHARE WHATSAPP STATUS";
+    tg.MainButton.color = "#25d366";
+    tg.MainButton.textColor = "#ffffff";
     tg.MainButton.show();
 
     Telegram.WebApp.onEvent('mainButtonClicked', function(){
-        exportProject();
+        sendToBot('export');
     });
 </script>
 

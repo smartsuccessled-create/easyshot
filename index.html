@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Easyshot Pro Telegram Mini App</title>
-    <!-- Telegram Web App SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -178,7 +177,7 @@
     <div class="section-title">TEXT & WATERMARK</div>
     <input type="text" id="textInput" placeholder="வீடியோ டெக்ஸ்ட் டைப் செய்யவும்..." value="Easyshot">
     
-    <div class="section-title" style="margin-top: 10px;">CUSTOM WATERMARK (வெறுமையாக விட்டால் நீங்கும்)</div>
+    <div class="section-title" style="margin-top: 10px;">CUSTOM WATERMARK</div>
     <input type="text" id="watermarkInput" placeholder="வாட்டர்மார்க் பெயர்..." value="Easyshot Pro">
 
     <!-- Color Filters -->
@@ -192,7 +191,6 @@
 </div>
 
 <script>
-    // Initialize Telegram Web App
     let tg = window.Telegram.WebApp;
     tg.expand();
 
@@ -206,12 +204,10 @@
     const videoUpload = document.getElementById('videoUpload');
     const audioUpload = document.getElementById('audioUpload');
 
-    // Text Live Update
     textInput.addEventListener('input', () => {
         previewText.textContent = textInput.value;
     });
 
-    // Watermark Control (Removal / Custom)
     watermarkInput.addEventListener('input', () => {
         watermarkDisplay.textContent = watermarkInput.value;
         if(watermarkInput.value.trim() === '') {
@@ -221,7 +217,6 @@
         }
     });
 
-    // Video Upload
     videoUpload.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -230,7 +225,6 @@
         }
     });
 
-    // Audio Upload (BGM)
     audioUpload.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
@@ -239,19 +233,16 @@
         }
     });
 
-    // Sync Audio
     video.addEventListener('play', () => { if(bgMusic.src) bgMusic.play(); });
     video.addEventListener('pause', () => { if(bgMusic.src) bgMusic.pause(); });
     video.addEventListener('seeked', () => { bgMusic.currentTime = video.currentTime; });
 
-    // Aspect Ratio Changer
     function changeAspectRatio(ratio, btn) {
         videoContainerBox.style.aspectRatio = ratio;
         document.querySelectorAll('.btn-group-3')[0].querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // Speed Changer
     function changeSpeed(rate, btn) {
         video.playbackRate = rate;
         const speedGroup = document.querySelectorAll('.btn-group-3')[1];
@@ -261,38 +252,32 @@
         btn.classList.add('active');
     }
 
-    // Filters
     function applyFilter(filterStyle, btn) {
         video.style.filter = filterStyle;
-        const filterBtns = document.querySelectorAll('.section-title');
-        // Find filter button group explicitly
         let parentGroup = btn.parentElement;
         parentGroup.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // Telegram Main Button Integration for Export/Download
-    tg.MainButton.text = "DOWNLOAD / EXPORT";
+    // Telegram Main Button Setup
+    tg.MainButton.text = "SEND VIDEO TO CHAT";
     tg.MainButton.color = tg.themeParams.button_color || "#ff3b5c";
     tg.MainButton.textColor = tg.themeParams.button_text_color || "#ffffff";
     tg.MainButton.show();
 
     Telegram.WebApp.onEvent('mainButtonClicked', function(){
-        // Trigger download simulation or direct link download if source is blob
-        if(video.src && video.src.startsWith('blob:')) {
-            const a = document.createElement('a');
-            a.href = video.src;
-            a.download = 'easyshot_edited.mp4';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            tg.showAlert("உங்களது எடிட் செய்யப்பட்ட வீடியோ டவுன்லோட் ஆனது!");
-        } else {
-            tg.showAlert("தற்போதைய டெமோ வீடியோ இயங்குகிறது. உங்கள் சொந்த வீடியோவை அப்லோட் செய்து டவுன்லோட் செய்யலாம்!");
-        }
+        // Send data back to bot or close with confirmation
+        tg.sendData(JSON.stringify({
+            action: "export_video",
+            video_url: video.src,
+            text: textInput.value,
+            watermark: watermarkInput.value
+        }));
+        tg.showAlert("உங்களது கோரிக்கை அனுப்பப்பட்டது! போட் சாட்டைப் பார்க்கவும்.");
+        tg.close();
     });
 </script>
 
 </body>
-    </html>
+        </html>
     

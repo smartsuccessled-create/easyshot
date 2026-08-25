@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easyshot - Advanced Video Editor</title>
+    <title>Easyshot Pro Telegram Mini App</title>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -12,8 +14,8 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background-color: #0f1016;
-            color: #ffffff;
+            background-color: var(--tg-theme-bg-color, #0f1016);
+            color: var(--tg-theme-text-color, #ffffff);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -23,14 +25,14 @@
         .container {
             width: 100%;
             max-width: 450px;
-            background: #1a1c24;
+            background: var(--tg-theme-secondary-bg-color, #1a1c24);
             border-radius: 16px;
             padding: 20px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
         h1 {
             text-align: center;
-            color: #ff3b5c;
+            color: var(--tg-theme-button-color, #ff3b5c);
             font-size: 22px;
             margin-bottom: 15px;
         }
@@ -44,8 +46,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: aspect-ratio 0.3s ease;
         }
-        video, img.overlay-img {
+        video {
             width: 100%;
             height: 100%;
             object-fit: contain;
@@ -75,7 +78,7 @@
             pointer-events: none;
         }
         .section-title {
-            font-size: 14px;
+            font-size: 13px;
             color: #a0a0b0;
             margin: 15px 0 8px 0;
             font-weight: 600;
@@ -83,6 +86,11 @@
         .btn-group {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .btn-group-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
             gap: 8px;
         }
         .btn {
@@ -98,9 +106,10 @@
             text-align: center;
         }
         .btn:hover, .btn.active {
-            background: #ff3b5c;
+            background: var(--tg-theme-button-color, #ff3b5c);
+            color: var(--tg-theme-button-text-color, #fff);
         }
-        input[type="text"], input[type="file"] {
+        input[type="text"] {
             width: 100%;
             padding: 10px;
             background: #2a2d3d;
@@ -119,41 +128,25 @@
             border-radius: 8px;
             cursor: pointer;
             font-size: 13px;
-            color: #ff3b5c;
+            color: var(--tg-theme-button-color, #ff3b5c);
             margin-bottom: 10px;
-        }
-        .download-btn {
-            width: 100%;
-            background: #ff3b5c;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 20px;
-            box-shadow: 0 4px 12px rgba(255, 59, 92, 0.4);
-        }
-        .download-btn:active {
-            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Easyshot Pro Editor</h1>
+    <h1>Easyshot Pro</h1>
 
     <!-- Video Preview Section -->
-    <div class="video-container" id="videoContainer">
+    <div class="video-container" id="videoContainerBox">
         <video id="mainVideo" src="https://www.w3schools.com/html/mov_bbb.mp4" controls playsinline></video>
         <div class="overlay-text" id="previewText">Easyshot</div>
         <div class="watermark" id="watermarkDisplay">Easyshot Pro</div>
     </div>
 
     <!-- Media Uploads -->
-    <div class="section-title">MEDIA & FILES</div>
+    <div class="section-title">MEDIA & AUDIO</div>
     <label class="file-input-label">
         📁 வீடியோவை மாற்றுக (Upload Video)
         <input type="file" id="videoUpload" accept="video/*" style="display: none;">
@@ -165,11 +158,27 @@
     </label>
     <audio id="bgMusic" loop></audio>
 
+    <!-- Aspect Ratio / Crop Settings -->
+    <div class="section-title">FRAME SIZE (ASPECT RATIO)</div>
+    <div class="btn-group-3">
+        <button class="btn active" onclick="changeAspectRatio('9/16', this)">Shorts 9:16</button>
+        <button class="btn" onclick="changeAspectRatio('1/1', this)">Square 1:1</button>
+        <button class="btn" onclick="changeAspectRatio('16/9', this)">Video 16:9</button>
+    </div>
+
+    <!-- Video Speed Settings -->
+    <div class="section-title">VIDEO SPEED</div>
+    <div class="btn-group-3">
+        <button class="btn" onclick="changeSpeed(0.5, this)">0.5x Slow</button>
+        <button class="btn active" onclick="changeSpeed(1.0, this)">1.0x Normal</button>
+        <button class="btn" onclick="changeSpeed(1.5, this)">1.5x Fast</button>
+    </div>
+
     <!-- Text & Watermark Settings -->
     <div class="section-title">TEXT & WATERMARK</div>
     <input type="text" id="textInput" placeholder="வீடியோ டெக்ஸ்ட் டைப் செய்யவும்..." value="Easyshot">
     
-    <div class="section-title" style="margin-top: 10px;">CUSTOM WATERMARK</div>
+    <div class="section-title" style="margin-top: 10px;">CUSTOM WATERMARK (வெறுமையாக விட்டால் நீங்கும்)</div>
     <input type="text" id="watermarkInput" placeholder="வாட்டர்மார்க் பெயர்..." value="Easyshot Pro">
 
     <!-- Color Filters -->
@@ -180,13 +189,15 @@
         <button class="btn" onclick="applyFilter('sepia(100%)', this)">Sepia</button>
         <button class="btn" onclick="applyFilter('contrast(150%) saturate(150%)', this)">High Contrast</button>
     </div>
-
-    <!-- Download Button -->
-    <button class="download-btn" onclick="downloadVideo()">சேமி / Download (Mock)</button>
 </div>
 
 <script>
+    // Initialize Telegram Web App
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+
     const video = document.getElementById('mainVideo');
+    const videoContainerBox = document.getElementById('videoContainerBox');
     const bgMusic = document.getElementById('bgMusic');
     const textInput = document.getElementById('textInput');
     const previewText = document.getElementById('previewText');
@@ -200,7 +211,7 @@
         previewText.textContent = textInput.value;
     });
 
-    // Watermark Live Update
+    // Watermark Control (Removal / Custom)
     watermarkInput.addEventListener('input', () => {
         watermarkDisplay.textContent = watermarkInput.value;
         if(watermarkInput.value.trim() === '') {
@@ -210,54 +221,78 @@
         }
     });
 
-    // Video Upload Handler
+    // Video Upload
     videoUpload.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
-            const url = URL.createObjectURL(file);
-            video.src = url;
+            video.src = URL.createObjectURL(file);
             video.load();
         }
     });
 
-    // Audio Upload Handler (BGM)
+    // Audio Upload (BGM)
     audioUpload.addEventListener('change', (event) => {
         const file = event.target.files[0];
         if (file) {
-            const url = URL.createObjectURL(file);
-            bgMusic.src = url;
+            bgMusic.src = URL.createObjectURL(file);
             bgMusic.load();
         }
     });
 
-    // Sync Audio with Video Play/Pause
-    video.addEventListener('play', () => {
-        if(bgMusic.src) bgMusic.play();
-    });
-    video.addEventListener('pause', () => {
-        if(bgMusic.src) bgMusic.pause();
-    });
-    video.addEventListener('seeked', () => {
-        bgMusic.currentTime = video.currentTime;
-    });
+    // Sync Audio
+    video.addEventListener('play', () => { if(bgMusic.src) bgMusic.play(); });
+    video.addEventListener('pause', () => { if(bgMusic.src) bgMusic.pause(); });
+    video.addEventListener('seeked', () => { bgMusic.currentTime = video.currentTime; });
 
-    // Filters Handler
-    function applyFilter(filterStyle, btn) {
-        video.style.filter = filterStyle;
-        document.querySelectorAll('.btn-group .btn').forEach(b => b.classList.remove('active'));
+    // Aspect Ratio Changer
+    function changeAspectRatio(ratio, btn) {
+        videoContainerBox.style.aspectRatio = ratio;
+        document.querySelectorAll('.btn-group-3')[0].querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    // Download Simulated Function
-    function downloadVideo() {
-        alert("உங்களது எடிட் செய்யப்பட்ட வீடியோ ஃபைல் ரெடியாகிறது! (Browser limitation காரணமாக டெமோ சேமிப்பு இயக்கப்பட்டுள்ளது).");
+    // Speed Changer
+    function changeSpeed(rate, btn) {
+        video.playbackRate = rate;
+        const speedGroup = document.querySelectorAll('.btn-group-3')[1];
+        if(speedGroup) {
+            speedGroup.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        }
+        btn.classList.add('active');
     }
+
+    // Filters
+    function applyFilter(filterStyle, btn) {
+        video.style.filter = filterStyle;
+        const filterBtns = document.querySelectorAll('.section-title');
+        // Find filter button group explicitly
+        let parentGroup = btn.parentElement;
+        parentGroup.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+    }
+
+    // Telegram Main Button Integration for Export/Download
+    tg.MainButton.text = "DOWNLOAD / EXPORT";
+    tg.MainButton.color = tg.themeParams.button_color || "#ff3b5c";
+    tg.MainButton.textColor = tg.themeParams.button_text_color || "#ffffff";
+    tg.MainButton.show();
+
+    Telegram.WebApp.onEvent('mainButtonClicked', function(){
+        // Trigger download simulation or direct link download if source is blob
+        if(video.src && video.src.startsWith('blob:')) {
+            const a = document.createElement('a');
+            a.href = video.src;
+            a.download = 'easyshot_edited.mp4';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            tg.showAlert("உங்களது எடிட் செய்யப்பட்ட வீடியோ டவுன்லோட் ஆனது!");
+        } else {
+            tg.showAlert("தற்போதைய டெமோ வீடியோ இயங்குகிறது. உங்கள் சொந்த வீடியோவை அப்லோட் செய்து டவுன்லோட் செய்யலாம்!");
+        }
+    });
 </script>
 
 </body>
     </html>
-
     
-        
-            
-                    

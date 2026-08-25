@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easyshot Pro - Revenue Edition</title>
+    <title>Easyshot Filmora Edition</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
@@ -13,52 +13,53 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         body {
-            background-color: var(--tg-theme-bg-color, #0f1016);
-            color: var(--tg-theme-text-color, #ffffff);
+            background-color: #121318;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 15px;
+            padding: 10px;
         }
         .container {
             width: 100%;
             max-width: 450px;
-            background: var(--tg-theme-secondary-bg-color, #1a1c24);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-            margin-bottom: 20px;
+            background: #1a1d24;
+            border-radius: 14px;
+            padding: 15px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            margin-bottom: 15px;
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
         h1 {
-            text-align: center;
-            color: var(--tg-theme-button-color, #ff3b5c);
-            font-size: 22px;
-            margin-bottom: 15px;
+            color: #ff4757;
+            font-size: 18px;
+            font-weight: bold;
         }
-        /* Ad Banner Box for Revenue */
-        .ad-banner {
-            width: 100%;
-            background: #252836;
-            border: 1px dashed #ff3b5c;
-            border-radius: 8px;
-            padding: 10px;
-            text-align: center;
-            font-size: 11px;
-            color: #ff3b5c;
-            margin-bottom: 15px;
+        .pro-badge {
+            background: linear-gradient(45deg, #ff4757, #ffa502);
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: bold;
         }
+        /* Filmora Canvas Preview */
         .video-container {
             position: relative;
             width: 100%;
             background: #000;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
             aspect-ratio: 9/16;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: aspect-ratio 0.3s ease;
         }
         video {
             width: 100%;
@@ -67,154 +68,184 @@
         }
         .overlay-text {
             position: absolute;
-            bottom: 20px;
+            bottom: 25px;
             left: 50%;
             transform: translateX(-50%);
             color: #fff;
-            font-size: 20px;
+            font-size: 18px;
             font-weight: bold;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.9);
             pointer-events: none;
-            white-space: nowrap;
         }
         .watermark {
             position: absolute;
-            top: 15px;
-            right: 15px;
+            top: 10px;
+            right: 10px;
             color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            font-weight: bold;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 4px 8px;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 3px 6px;
             border-radius: 4px;
+        }
+        /* Filmora Timeline UI */
+        .timeline-box {
+            background: #222632;
+            border-radius: 8px;
+            padding: 10px;
+            margin: 12px 0;
+            border: 1px solid #2f3542;
+        }
+        .timeline-track {
+            height: 28px;
+            background: #2d3436;
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 0 5px;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .timeline-progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            background: rgba(255, 71, 87, 0.4);
+            width: 0%;
             pointer-events: none;
         }
+        .timeline-label {
+            font-size: 11px;
+            color: #a4b0be;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        /* Tools Section */
         .section-title {
-            font-size: 13px;
-            color: #a0a0b0;
-            margin: 15px 0 8px 0;
+            font-size: 12px;
+            color: #747d8c;
+            margin: 12px 0 6px 0;
             font-weight: 600;
         }
-        .btn-group {
+        .tools-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 6px;
         }
-        .btn-group-3 {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-        }
-        .btn {
-            background: #2a2d3d;
-            color: #fff;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
+        .tool-btn {
+            background: #252a34;
+            color: #f1f2f6;
+            border: 1px solid #2f3542;
+            padding: 8px 4px;
+            border-radius: 6px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: 0.2s;
+            font-size: 11px;
             text-align: center;
+            transition: 0.2s;
         }
-        .btn:hover, .btn.active {
-            background: var(--tg-theme-button-color, #ff3b5c);
-            color: var(--tg-theme-button-text-color, #fff);
-        }
-        .premium-btn {
-            background: linear-gradient(45deg, #f12711, #f5af19);
+        .tool-btn:hover, .tool-btn.active {
+            background: #ff4757;
+            border-color: #ff4757;
             color: #fff;
-            font-weight: bold;
         }
         input[type="text"] {
             width: 100%;
-            padding: 10px;
-            background: #2a2d3d;
-            border: 1px solid #3a3f58;
-            border-radius: 8px;
+            padding: 8px 10px;
+            background: #252a34;
+            border: 1px solid #2f3542;
+            border-radius: 6px;
             color: #fff;
-            font-size: 14px;
-            margin-top: 5px;
-        }
-        .file-input-label {
-            display: block;
-            background: #2a2d3d;
-            border: 2px dashed #3a3f58;
-            padding: 12px;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
             font-size: 13px;
-            color: var(--tg-theme-button-color, #ff3b5c);
+            margin-top: 4px;
+        }
+        .file-upload-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
             margin-bottom: 10px;
+        }
+        .upload-btn {
+            background: #252a34;
+            border: 1px dashed #ff4757;
+            padding: 8px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            color: #ff4757;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Easyshot Pro 🚀</h1>
-
-    <!-- Revenue Ad Banner Space -->
-    <div class="ad-banner">
-        📢 Sponsored Ad Space (Daily Revenue Generator)
+    <div class="app-header">
+        <h1>Easyshot Filmora</h1>
+        <span class="pro-badge">PRO EDITOR</span>
     </div>
 
-    <!-- Video Preview Section -->
+    <!-- Video Canvas -->
     <div class="video-container" id="videoContainerBox">
-        <video id="mainVideo" src="https://www.w3schools.com/html/mov_bbb.mp4" controls playsinline></video>
+        <video id="mainVideo" src="https://www.w3schools.com/html/mov_bbb.mp4" playsinline></video>
         <div class="overlay-text" id="previewText">Easyshot</div>
-        <div class="watermark" id="watermarkDisplay">Easyshot Pro</div>
+        <div class="watermark" id="watermarkDisplay">Filmora Pro</div>
     </div>
 
-    <!-- Media Uploads -->
-    <div class="section-title">MEDIA & AUDIO</div>
-    <label class="file-input-label">
-        📁 வீடியோவை மாற்றுக (Upload Video)
-        <input type="file" id="videoUpload" accept="video/*" style="display: none;">
-    </label>
+    <!-- Filmora Style Timeline -->
+    <div class="timeline-box">
+        <div class="timeline-label">
+            <span id="currentTimeDisplay">0:00</span>
+            <span>TIMELINE TRACK</span>
+            <span id="durationDisplay">0:10</span>
+        </div>
+        <div class="timeline-track" id="timelineTrack">
+            <div class="timeline-progress" id="timelineProgress"></div>
+            <span style="font-size: 11px; z-index: 2; margin: auto; color: #dfe4ea;" id="playStatusText">▶ Tap to Play / Pause</span>
+        </div>
+    </div>
 
-    <label class="file-input-label">
-        🎵 பேக்ரவுண்ட் மியூசிக் சேர் (Add BGM)
-        <input type="file" id="audioUpload" accept="audio/*" style="display: none;">
-    </label>
+    <!-- Uploads -->
+    <div class="file-upload-row">
+        <label class="upload-btn">
+            📁 Video மாற்று
+            <input type="file" id="videoUpload" accept="video/*" style="display: none;">
+        </label>
+        <label class="upload-btn">
+            🎵 BGM சேர்
+            <input type="file" id="audioUpload" accept="audio/*" style="display: none;">
+        </label>
+    </div>
     <audio id="bgMusic" loop></audio>
 
-    <!-- Aspect Ratio / Crop Settings -->
-    <div class="section-title">FRAME SIZE (ASPECT RATIO)</div>
-    <div class="btn-group-3">
-        <button class="btn active" onclick="changeAspectRatio('9/16', this)">Shorts 9:16</button>
-        <button class="btn" onclick="changeAspectRatio('1/1', this)">Square 1:1</button>
-        <button class="btn" onclick="changeAspectRatio('16/9', this)">Video 16:9</button>
+    <!-- Filmora Tools Panel -->
+    <div class="section-title">ASPECT RATIO (FRAME)</div>
+    <div class="tools-grid">
+        <button class="tool-btn active" onclick="changeAspectRatio('9/16', this)">Shorts 9:16</button>
+        <button class="tool-btn" onclick="changeAspectRatio('1/1', this)">Square 1:1</button>
+        <button class="tool-btn" onclick="changeAspectRatio('16/9', this)">YouTube 16:9</button>
+        <button class="tool-btn" onclick="changeAspectRatio('4/5', this)">Insta 4:5</button>
     </div>
 
-    <!-- Video Speed Settings -->
     <div class="section-title">VIDEO SPEED</div>
-    <div class="btn-group-3">
-        <button class="btn" onclick="changeSpeed(0.5, this)">0.5x Slow</button>
-        <button class="btn active" onclick="changeSpeed(1.0, this)">1.0x Normal</button>
-        <button class="btn" onclick="changeSpeed(1.5, this)">1.5x Fast</button>
+    <div class="tools-grid">
+        <button class="tool-btn" onclick="changeSpeed(0.5, this)">0.5x</button>
+        <button class="tool-btn active" onclick="changeSpeed(1.0, this)">1.0x</button>
+        <button class="tool-btn" onclick="changeSpeed(1.5, this)">1.5x</button>
+        <button class="tool-btn" onclick="changeSpeed(2.0, this)">2.0x</button>
     </div>
 
-    <!-- Text & Watermark Settings -->
-    <div class="section-title">TEXT & WATERMARK</div>
-    <input type="text" id="textInput" placeholder="வீடியோ டெக்ஸ்ட் டைப் செய்யவும்..." value="Easyshot">
-    
-    <div class="section-title" style="margin-top: 10px;">WATERMARK CONTROLS</div>
-    <input type="text" id="watermarkInput" placeholder="வாட்டர்மார்க் பெயர்..." value="Easyshot Pro">
-
-    <!-- Premium Monetization Option -->
-    <div class="section-title">MONETIZATION & PRO</div>
-    <button class="btn premium-btn" style="width: 100%; padding: 12px;" onclick="unlockPremium()">⭐ Unlock Watermark Free (Telegram Stars)</button>
-
-    <!-- Color Filters -->
-    <div class="section-title">COLOR FILTERS</div>
-    <div class="btn-group">
-        <button class="btn active" onclick="applyFilter('none', this)">Normal</button>
-        <button class="btn" onclick="applyFilter('grayscale(100%)', this)">B&W</button>
-        <button class="btn" onclick="applyFilter('sepia(100%)', this)">Sepia</button>
-        <button class="btn" onclick="applyFilter('contrast(150%) saturate(150%)', this)">High Contrast</button>
+    <div class="section-title">FILTERS & EFFECTS</div>
+    <div class="tools-grid">
+        <button class="tool-btn active" onclick="applyFilter('none', this)">Normal</button>
+        <button class="tool-btn" onclick="applyFilter('grayscale(100%)', this)">B&W</button>
+        <button class="tool-btn" onclick="applyFilter('sepia(100%)', this)">Sepia</button>
+        <button class="tool-btn" onclick="applyFilter('contrast(160%)', this)">Contrast</button>
     </div>
+
+    <div class="section-title">TEXT OVERLAY</div>
+    <input type="text" id="textInput" placeholder="வீடியோ டெக்ஸ்ட்..." value="Easyshot">
 </div>
 
 <script>
@@ -226,22 +257,16 @@
     const bgMusic = document.getElementById('bgMusic');
     const textInput = document.getElementById('textInput');
     const previewText = document.getElementById('previewText');
-    const watermarkInput = document.getElementById('watermarkInput');
-    const watermarkDisplay = document.getElementById('watermarkDisplay');
     const videoUpload = document.getElementById('videoUpload');
     const audioUpload = document.getElementById('audioUpload');
+    const timelineTrack = document.getElementById('timelineTrack');
+    const timelineProgress = document.getElementById('timelineProgress');
+    const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+    const durationDisplay = document.getElementById('durationDisplay');
+    const playStatusText = document.getElementById('playStatusText');
 
     textInput.addEventListener('input', () => {
         previewText.textContent = textInput.value;
-    });
-
-    watermarkInput.addEventListener('input', () => {
-        watermarkDisplay.textContent = watermarkInput.value;
-        if(watermarkInput.value.trim() === '') {
-            watermarkDisplay.style.display = 'none';
-        } else {
-            watermarkDisplay.style.display = 'block';
-        }
     });
 
     videoUpload.addEventListener('change', (event) => {
@@ -260,52 +285,73 @@
         }
     });
 
-    video.addEventListener('play', () => { if(bgMusic.src) bgMusic.play(); });
-    video.addEventListener('pause', () => { if(bgMusic.src) bgMusic.pause(); });
-    video.addEventListener('seeked', () => { bgMusic.currentTime = video.currentTime; });
+    // Timeline Play/Pause Control
+    timelineTrack.addEventListener('click', () => {
+        if (video.paused) {
+            video.play();
+            if(bgMusic.src) bgMusic.play();
+            playStatusText.textContent = "⏸ Playing...";
+        } else {
+            video.pause();
+            if(bgMusic.src) bgMusic.pause();
+            playStatusText.textContent = "▶ Tap to Play / Pause";
+        }
+    });
+
+    video.addEventListener('timeupdate', () => {
+        let current = video.currentTime;
+        let duration = video.duration || 1;
+        let percent = (current / duration) * 100;
+        timelineProgress.style.width = percent + '%';
+        
+        let m = Math.floor(current / 60);
+        let s = Math.floor(current % 60);
+        currentTimeDisplay.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    });
+
+    video.addEventListener('loadedmetadata', () => {
+        let m = Math.floor(video.duration / 60);
+        let s = Math.floor(video.duration % 60);
+        durationDisplay.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+    });
 
     function changeAspectRatio(ratio, btn) {
         videoContainerBox.style.aspectRatio = ratio;
-        document.querySelectorAll('.btn-group-3')[0].querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        let parent = btn.parentElement;
+        parent.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
     function changeSpeed(rate, btn) {
         video.playbackRate = rate;
-        const speedGroup = document.querySelectorAll('.btn-group-3')[1];
-        if(speedGroup) {
-            speedGroup.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
-        }
+        let parent = btn.parentElement;
+        parent.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
     function applyFilter(filterStyle, btn) {
         video.style.filter = filterStyle;
-        let parentGroup = btn.parentElement;
-        parentGroup.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+        let parent = btn.parentElement;
+        parent.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
     }
 
-    function unlockPremium() {
-        tg.showAlert("Telegram Stars மூலம் பிரீமியம் வசதியை விரைவில் பெறலாம்! (Daily Revenue Enabled)");
-    }
-
-    // Telegram Main Button Integration
-    tg.MainButton.text = "EXPORT & SEND TO BOT";
-    tg.MainButton.color = tg.themeParams.button_color || "#ff3b5c";
+    // Telegram Export Button
+    tg.MainButton.text = "EXPORT FILMORA PROJECT";
+    tg.MainButton.color = tg.themeParams.button_color || "#ff4757";
     tg.MainButton.textColor = tg.themeParams.button_text_color || "#ffffff";
     tg.MainButton.show();
 
     Telegram.WebApp.onEvent('mainButtonClicked', function(){
         tg.sendData(JSON.stringify({
-            action: "export_video",
-            text: textInput.value,
-            watermark: watermarkInput.value
+            action: "filmora_export",
+            text: textInput.value
         }));
-        tg.showAlert("உங்கள் வீடியோ எடிட்டிங் வெற்றிகரமாக சேமிக்கப்பட்டது!");
+        tg.showAlert("உங்களது ஃபில்மோரா ப்ராஜெக்ட் வெற்றிகரமாக சேமிக்கப்பட்டது!");
         tg.close();
     });
 </script>
 
 </body>
-</html>
+    </html>
+            
